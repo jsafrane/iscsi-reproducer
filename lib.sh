@@ -80,12 +80,13 @@ function detach()
 	while ! iscsiadm -m node -p 127.0.0.1:3260 -T $IQN -o delete -I default; do sleep 1; done
 }
 
-
 # Simulation of a writer pod: attach + mount + write + umount + detach.
 function write()
 {
 	attach
-	echo "Hello from $IQN" > $MNT/file
+	echo "Hello from $IQN: $1" > $MNT/file
+	# store non-trivial amount of data to the volume
+	dd if=/dev/urandom of=$MNT/random bs=1M count=10
 	detach
 }
 
@@ -94,7 +95,7 @@ function check()
 {
 	attach $IQN
 	CNT=$( cat $MNT/file )
-	if [ "$CNT" != "Hello from $IQN" ]; then
+	if [ "$CNT" != "Hello from $IQN: $1" ]; then
 		echo "test mismatch, got '$CNT' instead of $IQN"
 	else
 		echo "test OK for $IQN"
