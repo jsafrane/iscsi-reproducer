@@ -3,6 +3,8 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
+mkdir -p /srv/iscsi
+
 # Global variables, yay!
 # Unique IQN. $1 is expected to be a short string, e.g. "1"
 IQN=iqn.2003-01.io.k8s:e2e.volume-$1
