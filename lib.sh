@@ -75,8 +75,11 @@ function detach()
 	rmdir $MNT
 
 	# Delete the device
-	D=$(basename $( readlink $DEV ) )
-	echo 1 > /sys/block/$D/device/delete
+	blockdev --flushbufs $DEV
+
+	# Do not remove the device (left here because Kubernetes removes them)
+	#D=$(basename $( readlink $DEV ) )
+	#echo 1 > /sys/block/$D/device/delete
 
 	while ! iscsiadm -m node -p 127.0.0.1:3260 -T $IQN --logout -I default; do sleep 1; done
 	while ! iscsiadm -m node -p 127.0.0.1:3260 -T $IQN -o delete -I default; do sleep 1; done
